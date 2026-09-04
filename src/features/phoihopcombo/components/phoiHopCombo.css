@@ -1,0 +1,21 @@
+.combo-page { min-height: 100vh; padding: 16px clamp(16px, 4vw, 104px) 40px; color: #26384f; font-family: Arial, Helvetica, sans-serif; background: #f8f8fc; }
+.combo-layout { display: grid; grid-template-columns: 262px minmax(0, 1fr); gap: clamp(35px, 9vw, 150px); align-items: start; }
+.combo-form { padding: 17px 16px; border: 1px solid #dce8ed; border-radius: 14px; box-shadow: 0 5px 18px rgba(37, 73, 94, .06); background: #fff; }
+.combo-form h2, .combo-list h2 { margin: 0 0 22px; color: #111827; font-size: 18px; text-align: center; }
+.combo-form label { display: grid; gap: 7px; margin-bottom: 16px; color: #31516d; font-size: 14px; }
+.combo-form input { height: 36px; padding: 0 10px; border: 1px solid #cfcfcf; border-radius: 5px; color: #26384f; font: inherit; outline: 0; background: #f9f9f9; }
+.combo-form input:focus { border-color: #64a9b2; box-shadow: 0 0 0 3px rgba(100, 169, 178, .14); }
+.combo-form button { width: 100%; height: 36px; margin-top: 5px; border: 0; border-radius: 5px; color: #fff; font: inherit; font-size: 16px; font-weight: 700; background: #61a978; cursor: pointer; }
+.combo-form button:hover { background: #4e9365; }
+.combo-status { display: block; min-height: 14px; margin-top: 7px; color: #4d9a74; font-size: 11px; text-align: center; }
+.combo-list { min-width: 0; }
+.combo-table-wrap { max-height: min(62vh, 620px); overflow-x: auto; overflow-y: scroll; border: 1px solid #e1eaef; border-radius: 9px; scrollbar-color: #b7bec0 #f4f6f6; scrollbar-width: thin; }
+.combo-table-wrap::-webkit-scrollbar { width: 5px; height: 5px; }
+.combo-table-wrap::-webkit-scrollbar-thumb { border-radius: 5px; background: #b7bec0; }
+.combo-table-wrap::-webkit-scrollbar-track { background: #f4f6f6; }
+.combo-table-wrap table { width: 100%; min-width: 780px; border-collapse: collapse; font-size: 12px; }
+.combo-table-wrap th { position: sticky; top: 0; z-index: 1; color: #36566e; font-size: 11px; text-align: left; background: #f3f8fa; }
+.combo-table-wrap th, .combo-table-wrap td { height: 32px; padding: 0 12px; border-bottom: 1px solid #e5e7ee; white-space: nowrap; }
+.combo-table-wrap th:first-child, .combo-table-wrap td:first-child { width: 45px; text-align: center; }
+.combo-table-wrap td { color: #617187; }
+@media (max-width: 760px) { .combo-page { padding: 20px 12px 30px; } .combo-layout { grid-template-columns: 1fr; gap: 24px; } .combo-form { width: min(340px, 100%); margin: 0 auto; } .combo-list { width: 100%; } .combo-table-wrap { max-height: 60vh; } }

@@ -1,0 +1,13 @@
+.score-config-page { min-height: 100vh; padding: 28px 20px 40px; overflow-x: hidden; color: #31516d; font-family: Arial, Helvetica, sans-serif; background: linear-gradient(145deg, #f5fafb, #f8f8fc 58%, #eef6f6); scrollbar-color: #b7bec0 #f4f6f6; scrollbar-width: thin; }
+.score-config-page::-webkit-scrollbar { width: 6px; }
+.score-config-page::-webkit-scrollbar-thumb { border-radius: 6px; background: #b7bec0; }
+.score-config-page::-webkit-scrollbar-track { background: #f4f6f6; }
+.score-config-form { width: min(460px, 100%); margin: 0 auto; padding: 24px 22px 20px; border: 1px solid #d7e7ea; border-radius: 16px; box-shadow: 0 12px 28px rgba(37, 73, 94, .08); background: rgba(255, 255, 255, .96); }
+.score-config-form h1 { margin: 0 0 24px; padding-bottom: 15px; border-bottom: 1px solid #e8f0f1; color: #18364a; font-size: 20px; font-weight: 700; line-height: 1.3; text-align: center; }
+.score-config-form label { display: grid; gap: 8px; margin-bottom: 16px; color: #31516d; font-size: 13px; line-height: 1.35; }
+.score-config-form input { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #d3e1e5; border-radius: 8px; color: #536579; font: inherit; font-size: 13px; outline: 0; background: #fbfdfe; transition: border-color .18s ease, box-shadow .18s ease; }
+.score-config-form input:focus { border-color: #64a9b2; box-shadow: 0 0 0 3px rgba(100, 169, 178, .14); }
+.score-config-form button { width: 100%; height: 40px; margin-top: 8px; border: 0; border-radius: 8px; color: #fff; font: inherit; font-size: 14px; font-weight: 700; background: linear-gradient(135deg, #65b4bd, #61a978); box-shadow: 0 5px 12px rgba(97, 169, 120, .2); cursor: pointer; }
+.score-config-form button:hover { background: #4e9365; }
+.score-config-status { display: block; min-height: 14px; margin-top: 7px; color: #4d9a74; font-size: 11px; text-align: center; }
+@media (max-width: 600px) { .score-config-page { padding: 20px 12px 30px; } .score-config-form { width: 100%; } .score-config-form h1 { font-size: 16px; } }

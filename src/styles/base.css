@@ -1,0 +1,573 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  color: #20343a;
+  background: #f5f8f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --bizen-primary: #49a7a2;
+  --bizen-primary-dark: #318d89;
+  --bizen-primary-soft: #e8f6f5;
+  --bizen-bg: #f5f8f8;
+  --bizen-card: #ffffff;
+  --bizen-border: #dfeceb;
+  --bizen-text: #24363d;
+  --bizen-muted: #71848a;
+  --bizen-shadow: 0 8px 28px rgba(41, 91, 95, .07);
+  --bizen-ink: #17323a;
+  --bizen-accent: #f08a62;
+  --bizen-surface-soft: #f0f7f6;
+  --bizen-shadow-lifted: 0 18px 45px rgba(31, 72, 77, .1);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { min-width: 320px; min-height: 100%; margin: 0; }
+body {
+  color: var(--bizen-ink);
+  background:
+    radial-gradient(circle at 92% 4%, rgba(73, 167, 162, .1), transparent 25rem),
+    linear-gradient(145deg, #f8fbfb 0%, #eef6f5 100%);
+}
+button, input, select { font-family: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.bizen-save-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .68);
+}
+
+.bizen-save-spinner {
+  width: 52px;
+  height: 52px;
+  border: 5px solid #d7e3e1;
+  border-top-color: var(--bizen-primary-dark);
+  border-right-color: var(--bizen-accent);
+  border-radius: 50%;
+  animation: bizen-save-spin .7s linear infinite;
+}
+
+@keyframes bizen-save-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Product-wide visual polish */
+.dashboard-layout {
+  background: transparent !important;
+}
+
+.dashboard-main {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .42), transparent 28rem),
+    transparent !important;
+}
+
+.dashboard-tab,
+button,
+input,
+select,
+textarea {
+  letter-spacing: 0;
+}
+
+.material-price-page,
+.product-price-page,
+.combo-page,
+.score-config-page,
+.production-page,
+.bom-page,
+.site-quantity-page,
+.quantity-page,
+.page,
+.customer-page {
+  background: transparent !important;
+}
+
+.material-price-form,
+.material-price-list,
+.product-price-form,
+.product-price-list,
+.combo-form,
+.combo-list,
+.score-config-form,
+.production-data,
+.bom-form,
+.bom-list,
+.quantity-panel,
+.quantity-shell,
+.site-quantity-card,
+.filter-bar,
+.customer-filters,
+.menu-info,
+.customer-menu-card {
+  border-color: rgba(184, 215, 212, .78) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--bizen-shadow-lifted) !important;
+}
+
+.material-price-form,
+.product-price-form,
+.combo-form,
+.score-config-form,
+.bom-form {
+  background: linear-gradient(155deg, #ffffff 0%, #f8fcfb 100%) !important;
+}
+
+.material-price-form h2,
+.product-price-form h2,
+.combo-form h2,
+.score-config-form h1,
+.bom-form h2,
+.production-data h1,
+.quantity-panel h2,
+.page-heading h1 {
+  font-family: 'Space Grotesk', 'DM Sans', sans-serif !important;
+}
+
+.material-price-form input,
+.product-price-form input,
+.combo-form input,
+.score-config-form input,
+.site-quantity-filters input,
+.site-quantity-filters select,
+.production-filters select,
+.production-date input,
+.material-price-search,
+.bom-search {
+  border-color: #cfe3e0 !important;
+  border-radius: 8px !important;
+  background: #f9fcfc !important;
+}
+
+.material-price-form input:hover,
+.product-price-form input:hover,
+.combo-form input:hover,
+.score-config-form input:hover,
+.site-quantity-filters input:hover,
+.site-quantity-filters select:hover,
+.production-filters select:hover {
+  border-color: #9ccbc7 !important;
+}
+
+.material-price-form button,
+.product-price-form button,
+.combo-form button,
+.score-config-form button,
+.bom-save,
+.site-search-button,
+.site-report-button,
+.production-search,
+.production-export,
+.search-button,
+.report-button {
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #45aaa5, #318d89) !important;
+}
+
+.material-price-form button:hover,
+.product-price-form button:hover,
+.combo-form button:hover,
+.score-config-form button:hover,
+.bom-save:hover,
+.site-search-button:hover,
+.site-report-button:hover,
+.production-search:hover,
+.production-export:hover,
+.search-button:hover,
+.report-button:hover {
+  background: linear-gradient(135deg, #318d89, #247572) !important;
+  box-shadow: 0 9px 18px rgba(49, 141, 137, .22);
+}
+
+.material-price-table-wrap,
+.product-price-table-wrap,
+.combo-table-wrap,
+.production-table-wrap,
+.bom-table-wrap {
+  border-color: #d5e7e4 !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7);
+}
+
+.material-price-table-wrap th,
+.product-price-table-wrap th,
+.combo-table-wrap th,
+.production-table-wrap th,
+.bom-table-wrap th {
+  color: #39636a !important;
+  letter-spacing: .04em;
+  background: #e9f5f3 !important;
+}
+
+.material-price-table-wrap td,
+.product-price-table-wrap td,
+.combo-table-wrap td,
+.production-table-wrap td,
+.bom-table-wrap td {
+  color: #48636a !important;
+}
+
+.material-price-table-wrap tbody tr:nth-child(even),
+.product-price-table-wrap tbody tr:nth-child(even),
+.combo-table-wrap tbody tr:nth-child(even),
+.production-table-wrap tbody tr:nth-child(even),
+.bom-table-wrap tbody tr:nth-child(even) {
+  background: #fbfdfd;
+}
+
+.material-price-table-wrap tbody tr:hover,
+.product-price-table-wrap tbody tr:hover,
+.combo-table-wrap tbody tr:hover,
+.production-table-wrap tbody tr:hover,
+.bom-table-wrap tbody tr:hover {
+  background: #edf8f6 !important;
+}
+
+@media (max-width: 560px) {
+  body {
+    background: linear-gradient(180deg, #f8fbfb 0%, #eef6f5 100%);
+  }
+
+  .material-price-form,
+  .material-price-list,
+  .product-price-form,
+  .product-price-list,
+  .combo-form,
+  .combo-list,
+  .score-config-form,
+  .production-data,
+  .bom-form,
+  .bom-list,
+  .quantity-panel,
+  .quantity-shell,
+  .site-quantity-card {
+    box-shadow: 0 10px 26px rgba(31, 72, 77, .08) !important;
+  }
+}
+
+/* Shared Bizen page language */
+.material-price-page,
+.product-price-page,
+.combo-page,
+.score-config-page,
+.production-page,
+.bom-page,
+.site-quantity-page,
+.quantity-page {
+  min-height: 100vh;
+  padding: 26px clamp(14px, 2.4vw, 34px) 40px;
+  color: var(--bizen-text);
+  background: linear-gradient(180deg, #f9fbfb 0%, #f4f8f8 100%);
+}
+
+.material-price-heading,
+.bom-heading,
+.site-quantity-header,
+.page-heading {
+  margin-bottom: 18px;
+}
+
+.material-price-heading h1,
+.bom-heading h1,
+.site-quantity-header h1,
+.page-heading h1 {
+  color: var(--bizen-primary-dark) !important;
+  font-size: clamp(22px, 2.1vw, 29px) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.3px;
+}
+
+.material-price-form,
+.material-price-list,
+.product-price-form,
+.product-price-list,
+.combo-form,
+.combo-list,
+.score-config-form,
+.production-data,
+.bom-form,
+.bom-list,
+.quantity-panel,
+.quantity-shell,
+.site-quantity-card {
+  border: 1px solid var(--bizen-border) !important;
+  border-radius: 16px !important;
+  background: var(--bizen-card) !important;
+  box-shadow: var(--bizen-shadow) !important;
+}
+
+/* Forms */
+.material-price-form,
+.product-price-form,
+.combo-form,
+.score-config-form { padding: 22px !important; }
+
+.material-price-form label,
+.product-price-form label,
+.combo-form label,
+.score-config-form label {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 14px;
+  color: #526970;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.material-price-form input,
+.product-price-form input,
+.combo-form input,
+.score-config-form input,
+.site-quantity-filters input,
+.site-quantity-filters select,
+.production-filters select,
+.production-date input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d7e5e4;
+  border-radius: 9px;
+  outline: 0;
+  color: #294047;
+  background: #fbfdfd;
+  transition: .18s ease;
+}
+
+.material-price-form input:focus,
+.product-price-form input:focus,
+.combo-form input:focus,
+.score-config-form input:focus,
+.site-quantity-filters input:focus,
+.site-quantity-filters select:focus,
+.production-filters select:focus,
+.production-date input:focus {
+  border-color: var(--bizen-primary);
+  box-shadow: 0 0 0 3px rgba(73, 167, 162, .12);
+}
+
+.material-price-form button,
+.product-price-form button,
+.combo-form button,
+.score-config-form button,
+.bom-save,
+.site-search-button,
+.site-report-button,
+.production-search,
+.production-export,
+.search-button,
+.report-button {
+  min-height: 40px;
+  border: 0 !important;
+  border-radius: 9px !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  background: var(--bizen-primary) !important;
+  box-shadow: 0 5px 12px rgba(73, 167, 162, .18);
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.material-price-form button:hover,
+.product-price-form button:hover,
+.combo-form button:hover,
+.score-config-form button:hover,
+.bom-save:hover,
+.site-search-button:hover,
+.site-report-button:hover,
+.production-search:hover,
+.production-export:hover,
+.search-button:hover,
+.report-button:hover { background: var(--bizen-primary-dark) !important; transform: translateY(-1px); }
+
+/* Cards */
+.material-price-card-heading h2,
+.product-price-form h2,
+.combo-form h2,
+.score-config-form h1,
+.bom-card-heading h2,
+.bom-list-heading h2,
+.product-price-list h2,
+.combo-list h2,
+.site-report-heading h2,
+.quantity-panel h2,
+.production-data h1 {
+  color: #2d464c !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+
+.material-price-card-heading p,
+.bom-card-heading p { color: var(--bizen-muted); }
+
+/* Tables */
+.material-price-table-wrap,
+.product-price-table-wrap,
+.combo-table-wrap,
+.production-table-wrap,
+.bom-table-wrap {
+  max-height: min(62vh, 620px) !important;
+  overflow: auto !important;
+  border: 1px solid #e0ebea !important;
+  border-radius: 11px !important;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.material-price-table-wrap::-webkit-scrollbar,
+.product-price-table-wrap::-webkit-scrollbar,
+.combo-table-wrap::-webkit-scrollbar,
+.production-table-wrap::-webkit-scrollbar,
+.bom-table-wrap::-webkit-scrollbar { width: 7px; height: 7px; }
+
+.material-price-table-wrap::-webkit-scrollbar-thumb,
+.product-price-table-wrap::-webkit-scrollbar-thumb,
+.combo-table-wrap::-webkit-scrollbar-thumb,
+.production-table-wrap::-webkit-scrollbar-thumb,
+.bom-table-wrap::-webkit-scrollbar-thumb { background: #b8d8d5; border-radius: 99px; }
+
+.material-price-table-wrap table,
+.product-price-table-wrap table,
+.combo-table-wrap table,
+.production-table-wrap table,
+.bom-table-wrap table { min-width: 720px; border-collapse: separate; border-spacing: 0; }
+
+.material-price-table-wrap th,
+.product-price-table-wrap th,
+.combo-table-wrap th,
+.production-table-wrap th,
+.bom-table-wrap th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 42px;
+  padding: 0 12px;
+  border-bottom: 1px solid #dbe9e8;
+  color: #587077;
+  font-size: 10px;
+  font-weight: 800;
+  background: #eef8f7;
+}
+
+.material-price-table-wrap td,
+.product-price-table-wrap td,
+.combo-table-wrap td,
+.production-table-wrap td,
+.bom-table-wrap td {
+  height: 43px;
+  padding: 0 12px;
+  border-bottom: 1px solid #edf3f2;
+  color: #5f747a;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.material-price-table-wrap tbody tr:hover,
+.product-price-table-wrap tbody tr:hover,
+.combo-table-wrap tbody tr:hover,
+.production-table-wrap tbody tr:hover,
+.bom-table-wrap tbody tr:hover { background: #f6fbfb; }
+
+/* Material / product / combo / BOM layouts */
+.material-price-layout,
+.product-price-layout,
+.combo-layout { display: grid; grid-template-columns: minmax(280px, 350px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.material-price-form, .product-price-form, .combo-form { min-width: 0; }
+.material-price-list, .product-price-list, .combo-list { min-width: 0; padding: 21px !important; }
+.material-price-list-heading, .bom-list-heading { align-items: center !important; }
+.material-price-search, .bom-search { border-radius: 9px !important; background: #fbfdfd !important; }
+
+/* BOM */
+.bom-page { padding-top: 26px; }
+.bom-layout { gap: 18px; }
+.bom-form { padding: 22px !important; }
+.bom-list { padding: 21px !important; }
+.bom-table-wrap { max-height: min(64vh, 660px) !important; }
+
+/* Site report */
+.site-quantity-page { padding-top: 22px; }
+.site-quantity-filters { border-radius: 14px !important; box-shadow: var(--bizen-shadow) !important; background: #fff !important; }
+.site-quantity-card { padding: 22px !important; }
+.site-day-empty { border-radius: 10px !important; background: #fff !important; }
+.site-day-empty:hover { border-color: #9ed3d0 !important; box-shadow: 0 3px 10px rgba(73, 167, 162, .08); }
+
+/* Quantity */
+.quantity-page { padding-top: 16px; }
+.quantity-shell { max-width: 1500px; margin: 0 auto; padding: 22px !important; }
+.quantity-panel { padding: 20px !important; }
+.quantity-field { border-bottom: 1px solid #edf2f1; }
+.quantity-control input { border: 1px solid #d7e5e4 !important; border-radius: 8px !important; }
+.quantity-control button { border: 1px solid #cde1df !important; border-radius: 8px !important; color: var(--bizen-primary-dark) !important; background: var(--bizen-primary-soft) !important; }
+.shift-tabs { border-radius: 10px; background: #edf7f6; }
+
+/* Production */
+.production-page { padding-top: 22px; }
+.production-filters { padding: 16px !important; border: 1px solid var(--bizen-border); border-radius: 14px; background: #fff; box-shadow: var(--bizen-shadow); }
+.production-data { padding: 21px !important; }
+
+/* Score configuration */
+.score-config-page { display: flex; justify-content: center; }
+.score-config-form { width: min(100%, 760px); }
+.score-config-form h1 { margin: 0 0 22px; color: var(--bizen-primary-dark) !important; font-size: 23px !important; }
+.score-config-form label { grid-template-columns: minmax(0, 1fr) 120px; align-items: center; }
+.score-config-form button { width: 100%; margin-top: 5px; }
+
+/* Menu week / customer menu: align backgrounds and controls */
+.page { min-height: 100vh !important; padding: 24px clamp(12px, 2vw, 28px) 34px !important; background: linear-gradient(180deg, #f9fbfb, #f3f8f8) !important; }
+.filter-bar { border: 1px solid var(--bizen-border) !important; border-radius: 14px !important; box-shadow: var(--bizen-shadow) !important; background: #fff !important; }
+.day-column { border: 1px solid #dceae9 !important; border-radius: 12px !important; overflow: hidden; background: #fff !important; box-shadow: 0 5px 18px rgba(41,91,95,.06); }
+.day-header { background: #e9f6f5 !important; border-bottom-color: #d4e9e7 !important; }
+.food-item { border-color: #edf3f2 !important; }
+.food-selector { border-color: #dce9e8 !important; border-radius: 8px !important; }
+.customer-page { background: linear-gradient(180deg, #f8fbfb, #f1f7f7) !important; }
+.menu-info, .customer-filters, .customer-menu-card { box-shadow: var(--bizen-shadow) !important; }
+.customer-filters { border-color: var(--bizen-border) !important; }
+.customer-day-header { background: #e8f6f5 !important; border-color: #d1e8e6 !important; }
+
+/* Sidebar refinements */
+.dashboard-sidebar { width: 250px !important; border-right-color: #dce9e8 !important; box-shadow: 4px 0 20px rgba(35,79,83,.06) !important; }
+.dashboard-brand { height: 96px !important; flex-direction: column; background: linear-gradient(135deg, #55b5af, #3e9f9b) !important; }
+.dashboard-tabs { padding: 18px 11px !important; gap: 6px !important; }
+.dashboard-tab { min-height: 48px !important; border-radius: 11px !important; color: #42575d !important; }
+.dashboard-tab:hover { color: var(--bizen-primary-dark) !important; background: #eff8f7 !important; }
+.dashboard-tab.active { color: #277e7a !important; background: #e6f5f4 !important; box-shadow: inset 3px 0 0 var(--bizen-primary); }
+.dashboard-tab-icon { color: #83959a !important; }
+.dashboard-tab.active .dashboard-tab-icon { color: var(--bizen-primary-dark) !important; }
+.dashboard-main { width: calc(100% - 250px) !important; margin-left: 250px !important; }
+
+@media (max-width: 900px) {
+  .dashboard-sidebar { width: min(290px, calc(100vw - 14px)) !important; }
+  .dashboard-main { width: 100% !important; margin-left: 0 !important; }
+  .material-price-layout, .product-price-layout, .combo-layout { grid-template-columns: 1fr; }
+  .material-price-list, .product-price-list, .combo-list, .bom-list { order: 2; }
+  .material-price-form, .product-price-form, .combo-form, .bom-form { order: 1; }
+  .score-config-form label { grid-template-columns: 1fr; }
+  .score-config-form label input { width: 100%; }
+  .site-quantity-filters { grid-template-columns: 1fr !important; }
+  .quantity-panels { grid-template-columns: 1fr !important; }
+  .quantity-shell { padding: 16px !important; }
+  .page { padding-top: 18px !important; }
+}
+
+@media (max-width: 560px) {
+  .material-price-page, .product-price-page, .combo-page, .score-config-page, .production-page, .bom-page, .site-quantity-page, .quantity-page { padding: 58px 10px 24px; }
+  .material-price-form, .material-price-list, .product-price-form, .product-price-list, .combo-form, .combo-list, .score-config-form, .production-data, .bom-form, .bom-list, .quantity-panel, .quantity-shell, .site-quantity-card { border-radius: 13px !important; }
+  .material-price-list, .product-price-list, .combo-list, .bom-list, .production-data { padding: 14px !important; }
+  .material-price-list-heading, .bom-list-heading { align-items: stretch !important; flex-direction: column !important; }
+  .material-price-search, .bom-search { width: 100% !important; }
+  .site-report-heading { gap: 12px; }
+  .site-report-button, .report-button { width: 100%; }
+  .quantity-shell { padding: 13px !important; }
+  .topbar { flex-wrap: wrap !important; height: auto !important; min-height: 56px; padding: 8px !important; }
+  .topbar-left { width: 100%; flex-wrap: wrap; }
+  .account-links { width: 100%; justify-content: space-between; }
+  .production-filters { grid-template-columns: 1fr !important; }
+  .production-search, .production-export { width: 100% !important; }
+}
