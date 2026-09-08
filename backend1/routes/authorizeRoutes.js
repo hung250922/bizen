@@ -24,12 +24,33 @@ module.exports = (router) => {
                 return res.status(401).json({ data: null, error: 'Client ID Google không khớp hoặc email Google chưa xác minh.' });
             }
             let user = await getUser({ email: profile.email.toLowerCase() });
-            if (!user) {
-                user = await addUser({ name: profile.name, email: profile.email.toLowerCase(), picture: profile.picture, googleId: profile.sub, isAuthenticated: true });
-            } else {
-                user = await updateUser({ _id: user._id, name: profile.name, picture: profile.picture, googleId: profile.sub, isAuthenticated: true });
+            const isSuperAdmin = authController.isSuperAdminEmail(profile.email);
+            if (user?.isAuthenticated === false) {
+                const error = user.approvalStatus === 'pending'
+                    ? 'Tài khoản Google chưa được phép kích hoạt. Vui lòng liên hệ quản trị viên để được phê duyệt.'
+                    : 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
+                return res.status(403).json({ data: null, error });
             }
-            return res.json({ data: user, error: null });
+            if (!user) {
+                user = await addUser({
+                    name: profile.name,
+                    email: profile.email.toLowerCase(),
+                    picture: profile.picture,
+                    googleId: profile.sub,
+                    isAuthenticated: isSuperAdmin,
+                    approvalStatus: isSuperAdmin ? 'approved' : 'pending',
+                    permissions: isSuperAdmin ? undefined : ['dashboard'],
+                    ...(isSuperAdmin ? { scope: 'admin', isSuperAdmin: true } : {}),
+                });
+                if (!isSuperAdmin) {
+                    return res.status(403).json({ data: null, error: 'Tài khoản Google chưa được phép kích hoạt. Vui lòng liên hệ quản trị viên để được phê duyệt.' });
+                }
+            } else {
+                user = await updateUser({ _id: user._id, name: profile.name, googleId: profile.sub, ...(profile.picture ? { picture: profile.picture } : {}), ...(isSuperAdmin ? { scope: 'admin', isSuperAdmin: true, isAuthenticated: true } : {}) });
+            }
+            const responseUser = user.toObject ? user.toObject() : user;
+            responseUser.accessToken = authController.createAccessToken(user);
+            return res.json({ data: responseUser, error: null });
         } catch(error) {
             console.log('-- google authenticate error', error.message);
             return res.status(401).json({ data: null, error: 'Đăng nhập Google thất bại.' });
@@ -37,6 +58,8 @@ module.exports = (router) => {
     });
 
     router.post(`/authenticate`, authController.isBasicAuthAuthenticated, async(req, res) => {
+        return res.status(410).json({ data: null, error: 'Phương thức đăng nhập cũ không còn được hỗ trợ. Hãy đăng nhập bằng Google.' });
+        /* Legacy email-only login is retained below for reference but cannot issue access tokens. */
         try {
             const { email } = req.body;
             let findUser = await getUser({ email });
@@ -44,11 +67,13 @@ module.exports = (router) => {
             if(!findUser) {
                 return res.json({ data: null, error: "Email đăng nhập không tồn tại!" });
             }
-            if (process.env.SUPER_ADMIN_EMAIL && email.toLowerCase() === process.env.SUPER_ADMIN_EMAIL.toLowerCase()) {
+            if (authController.isSuperAdminEmail(email)) {
                 findUser.scope = "admin";
                 await findUser.save();
             }
-            return res.json({ data: findUser, error: null });
+            const responseUser = findUser.toObject ? findUser.toObject() : findUser;
+            responseUser.accessToken = authController.createAccessToken(findUser);
+            return res.json({ data: responseUser, error: null });
         } catch(error) {
             console.log("-- error", error)
             return res.json({ data: null, error: "authenticate is failed"  });;

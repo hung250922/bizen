@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
     scope: { type: mongoose.Schema.Types.Mixed },
     permissions: { type: [String], default: [] },
     isAuthenticated: { type: Boolean },
+    approvalStatus: { type: String, enum: ['pending', 'approved', 'blocked'], default: 'approved' },
     lastSeen: { type: Date },
     isOnline: { type: Boolean, default: false },
     created_at: { type: Date, default: Date.now },

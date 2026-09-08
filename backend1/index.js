@@ -13,6 +13,8 @@ const moment = require('moment');
 const app = express();
 const router = express.Router();
 const { connectDB } = require('./mongodb');
+const activityMiddleware = require('./middleware/activity');
+const authController = require('./middleware/auth');
 
 app.use(cors());
 // app.use(bodyParser.json());
@@ -20,6 +22,7 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb', extended: true}));
 app.use('/api', router);
 app.use('', router);
+router.use(activityMiddleware);
 // app.use(bodyParser.urlencoded({ extended: true ,limit:'50mb'}));
 
 
@@ -44,6 +47,9 @@ app.use(function(req, res, next) {
 // app.use(cookieParser('82e4e438a0705fabf61f9854e3b575af'));
 
 require('./routes/authorizeRoutes')(router);
+// Keep the existing route handlers, then apply authenticated permission checks to business APIs.
+router.use(authController.requireAppPermission);
+require('./routes/activityRoutes')(router);
 require('./routes/userRoutes')(router);
 require('./routes/larkSuiteRoutes')(router);
 require('./routes/bizencateringRoutes')(router);

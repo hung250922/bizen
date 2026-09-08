@@ -5,9 +5,36 @@ const {
 var bcrypt = require("bcryptjs");
 const saltRounds = 10;
 var authController = require('../middleware/auth');
+const { models: { userDb } } = require('../mongodb');
+
+function isAdminRecord(user) {
+    return authController.isAdminUser(user);
+}
+
+function isProtectedAdmin(user) {
+    return user?.isSuperAdmin === true || authController.isSuperAdminEmail(user?.email);
+}
+
+async function preventAdminLockout(req, targetUser, nextRole, isLocking) {
+    if (isProtectedAdmin(targetUser)) return 'Tài khoản quản trị viên gốc không thể bị hạ quyền hoặc xóa.';
+    if (String(req.user?._id) === String(targetUser._id) && nextRole !== undefined && nextRole !== 'admin') {
+        return 'Bạn không thể tự hạ quyền quản trị viên của chính mình.';
+    }
+    if (nextRole !== undefined && nextRole !== 'admin' && isAdminRecord(targetUser)) {
+        const adminUsers = await userDb.find({}).select('scope isSuperAdmin is_admin');
+        const adminCount = adminUsers.filter((user) => isAdminRecord(user)).length;
+        if (adminCount <= 1) return 'Không thể hạ quyền quản trị viên cuối cùng.';
+    }
+    if (isLocking && isAdminRecord(targetUser)) {
+        const adminUsers = await userDb.find({}).select('scope isSuperAdmin is_admin');
+        const adminCount = adminUsers.filter((user) => isAdminRecord(user)).length;
+        if (adminCount <= 1) return 'Không thể khóa quản trị viên cuối cùng.';
+    }
+    return null;
+}
 
 module.exports = (router) => {
-    router.get(`/users`, authController.isBasicAuthAuthenticated, async(req, res) => {
+    router.get(`/users`, authController.isBasicAuthAuthenticated, authController.requireUser, authController.requireAdmin, async(req, res) => {
         console.log("--- get users query:", req.query);
         try {
             // var filter = {};
@@ -108,7 +135,7 @@ module.exports = (router) => {
     //     }
     // });
 
-    router.get(`/users/:id`, authController.isBasicAuthAuthenticated, async(req, res) => {
+    router.get(`/users/:id`, authController.isBasicAuthAuthenticated, authController.requireUser, authController.requireSelfOrAdmin, async(req, res) => {
         try {
             const findUser = await User.findOne({
                 where: {
@@ -136,7 +163,7 @@ module.exports = (router) => {
         }
     })
 
-    router.post(`/user`, authController.isBasicAuthAuthenticated, async(req, res) => {
+    router.post(`/user`, authController.isBasicAuthAuthenticated, authController.requireUser, authController.requireAdmin, async(req, res) => {
         try {
             const newUser = await addUser(req.body);
             return res.json({ data: newUser, error: null });
@@ -146,12 +173,24 @@ module.exports = (router) => {
         }
     });
 
-    router.put(`/user/:id`, authController.isBasicAuthAuthenticated, async(req, res) => {
+    router.put(`/user/:id`, authController.isBasicAuthAuthenticated, authController.requireUser, authController.requireAdmin, async(req, res) => {
         console.log("--- update user req.body", req.body);
         try {
+            if (req.body.scope !== undefined && !['admin', 'staff'].includes(req.body.scope)) {
+                return res.status(400).json({ data: null, error: "Vai trò chỉ được là admin hoặc staff." });
+            }
+            if (req.body.permissions !== undefined && !Array.isArray(req.body.permissions)) {
+                return res.status(400).json({ data: null, error: "Danh sách quyền không hợp lệ." });
+            }
             const findUser = await getUser({ _id: req.params.id });
             if(findUser) {
-                const updatedUser = await updateUser({ _id: req.params.id, ...req.body });
+                const protectionError = await preventAdminLockout(req, findUser, req.body.scope, req.body.isAuthenticated === false);
+                if (protectionError) return res.status(403).json({ data: null, error: protectionError });
+                const updatedUser = await updateUser({
+                    _id: req.params.id,
+                    ...req.body,
+                    ...(req.body.isAuthenticated === false ? { isOnline: false, lastSeen: new Date() } : {}),
+                });
                 return res.json({ data: updatedUser, error: null });
             } else {
                 return res.json({ data: null, error: "Không tìm thấy user id!"});
@@ -162,8 +201,12 @@ module.exports = (router) => {
         }
     });
 
-    router.delete(`/user/:id`, authController.isBasicAuthAuthenticated, async(req, res) => {
+    router.delete(`/user/:id`, authController.isBasicAuthAuthenticated, authController.requireUser, authController.requireAdmin, async(req, res) => {
         try {
+            const targetUser = await getUser({ _id: req.params.id });
+            if (!targetUser) return res.status(404).json({ data: null, error: "Không tìm thấy user id!" });
+            const protectionError = await preventAdminLockout(req, targetUser, 'staff');
+            if (protectionError) return res.status(403).json({ data: null, error: protectionError });
             const deletedUser = await deleteUser(req.params.id);
             if (!deletedUser) return res.status(404).json({ data: null, error: "Không tìm thấy user id!" });
             return res.json({ data: deletedUser, error: null });
@@ -173,7 +216,7 @@ module.exports = (router) => {
         }
     });
 
-    router.post(`/user/:id/presence`, authController.isBasicAuthAuthenticated, async(req, res) => {
+    router.post(`/user/:id/presence`, authController.isBasicAuthAuthenticated, authController.requireUser, authController.requireSelfOrAdmin, async(req, res) => {
         try {
             const user = await updatePresence(req.params.id, req.body.isOnline !== false);
             if (!user) return res.status(404).json({ data: null, error: "Không tìm thấy user id!" });

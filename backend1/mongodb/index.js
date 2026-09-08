@@ -7,6 +7,7 @@ const {
 const {
     KiemThuNguyenVatLieuDb,
 } = require('./models/KiemThuc3Buoc');
+const { activityLogDb } = require('./models/ActivityLog');
 
 const connectDB = async (mongoURI) => {
     try {
@@ -31,5 +32,6 @@ module.exports = {
         DonGiaSanPhamDb,
         PhoiHopComboDb,
         KiemThuNguyenVatLieuDb,
+        activityLogDb,
     }
 };

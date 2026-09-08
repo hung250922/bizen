@@ -6,6 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/authenticate': 'http://localhost:4130',
+      '/activities': 'http://localhost:4130',
       '/user': 'http://localhost:4130',
       '/users': 'http://localhost:4130',
       '/catering': 'http://localhost:4130',
