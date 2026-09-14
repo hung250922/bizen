@@ -33,6 +33,10 @@ const TABLE_IDS = {
 	5: 'tbltXo4LNSuvs2ys',
 };
 
+const OPTION_TABLE_ID = 'tblcesBeBMwmAFFn';
+const UNIT_OPTIONS_TABLE_ID = 'tblrH9yxAHbqantC';
+const PO_OPTIONS_TABLE_ID = 'tbltXo4LNSuvs2ys';
+
 function parseDateKey(value) {
 	const raw = valueToText(value);
 
@@ -111,24 +115,72 @@ function normalizeFieldName(name) {
 		.replace(/[^a-z0-9]+/g, '');
 }
 
-function getForm4ReceivingDate(fields) {
-	const exactNames = [
-		'Ngày giờ muốn nhận hàng',
-		'Ngày giờ muốn nhận',
-		'Ngày nhận hàng',
-	];
+function getNormalizedField(fields, normalizedName) {
+	const fieldName = Object.keys(fields).find(
+		(name) => normalizeFieldName(name) === normalizedName
+	);
 
-	for (const name of exactNames) {
-		if (fields[name] != null) {
-			return fields[name];
+	return fieldName ? fields[fieldName] : undefined;
+}
+
+function normalizeClientCode(value) {
+	return valueToText(value).trim().toLowerCase();
+}
+
+async function getOptionMap(token) {
+	const options = new Map();
+
+	for (const tableId of [
+		OPTION_TABLE_ID,
+		UNIT_OPTIONS_TABLE_ID,
+		PO_OPTIONS_TABLE_ID,
+	]) {
+		const url =
+			`https://open.larksuite.com/open-apis/bitable/v1/apps/${BASE_ID}` +
+			`/tables/${tableId}/fields`;
+		const response = await axios.get(url, {
+			params: { page_size: 100 },
+			headers: { Authorization: `Bearer ${token}` },
+		});
+
+		for (const field of response.data?.data?.items || []) {
+			for (const option of field.property?.options || []) {
+				options.set(option.id, String(option.name).trim());
+			}
 		}
 	}
 
+	return options;
+}
+
+function replaceOptionIds(value, optionMap) {
+	if (typeof value === 'string') {
+		return optionMap.get(value) || value;
+	}
+
+	if (Array.isArray(value)) {
+		return value.map((item) => replaceOptionIds(item, optionMap));
+	}
+
+	if (value && typeof value === 'object') {
+		return Object.fromEntries(
+			Object.entries(value).map(([key, item]) => [
+				key,
+				replaceOptionIds(item, optionMap),
+			])
+		);
+	}
+
+	return value;
+}
+
+function getForm4ReceivingDate(fields) {
 	const dateField = Object.keys(fields).find((name) => {
 		const normalized = normalizeFieldName(name);
 
 		return (
 			normalized.includes('ngaygiomuonnhanhang') ||
+			normalized.includes('ngaygiomuonnhan') ||
 			normalized.includes('ngaynhanhang')
 		);
 	});
@@ -138,76 +190,43 @@ function getForm4ReceivingDate(fields) {
 		: undefined;
 }
 
-async function searchRecords(
-	token,
-	tableId,
-	clientCodes,
-	filterByClient = true
-) {
+async function searchRecords(token, tableId) {
 	const url =
-		`https://open.larksuite.com/open-apis/bitable/v1/apps/${BASE_ID}/tables/${tableId}/records/search`;
-
+		`https://open.larksuite.com/open-apis/bitable/v1/apps/${BASE_ID}/tables/${tableId}/records`;
 	const records = [];
+	const recordIds = new Set();
+	const pageTokens = new Set();
 	let pageToken;
 
 	do {
-		const body = {
-			page_size: 500,
+		if (pageToken && pageTokens.has(pageToken)) break;
+		if (pageToken) pageTokens.add(pageToken);
 
-			...(pageToken
-				? {
-						page_token: pageToken,
-					}
-				: {}),
+		const response = await axios.get(url, {
+			params: {
+				page_size: 500,
+				...(pageToken ? { page_token: pageToken } : {}),
+			},
+			headers: { Authorization: `Bearer ${token}` },
+		});
 
-			...(filterByClient &&
-			clientCodes.length > 0
-				? {
-						filter: {
-							conditions: clientCodes.map(
-								(clientCode) => ({
-									field_name: 'Khách hàng',
-									operator: 'is',
-									value: [clientCode],
-								})
-							),
-							conjunction: 'or',
-						},
-					}
-				: {}),
-		};
-
-		const response = await axios.post(
-			url,
-			body,
-			{
-				headers: {
-					Authorization:
-						`Bearer ${token}`,
-					'Content-Type':
-						'application/json',
-				},
-			}
-		);
-
-		if (
-			response.data?.code &&
-			response.data.code !== 0
-		) {
+		if (response.data?.code && response.data.code !== 0) {
 			throw new Error(
-				response.data.msg ||
-					'Lark search thất bại.'
+				response.data.msg || 'Lark search thất bại.'
 			);
 		}
 
-		records.push(
-			...(response.data?.data?.items || [])
-		);
+		for (const record of response.data?.data?.items || []) {
+			if (record.record_id && recordIds.has(record.record_id)) continue;
+			if (record.record_id) recordIds.add(record.record_id);
+			records.push(record);
+		}
 
-		pageToken =
-			response.data?.data?.has_more
-				? response.data.data.page_token
-				: undefined;
+		const nextPageToken = response.data?.data?.has_more
+			? response.data.data.page_token
+			: undefined;
+		if (!nextPageToken || nextPageToken === pageToken) break;
+		pageToken = nextPageToken;
 	} while (pageToken);
 
 	return records;
@@ -276,20 +295,45 @@ module.exports = (router) => {
 					});
 				}
 
-				const records =
+				const optionMap =
+					await getOptionMap(token);
+
+				const records = (
 					await searchRecords(
 						token,
-						TABLE_IDS[template],
-						clientCodes,
-						!useAllClients &&
-							template !== 4 &&
-							template !== 5
-					);
+						TABLE_IDS[template]
+					)
+				).map((record) => ({
+					...record,
+					fields: replaceOptionIds(
+						record.fields || {},
+						optionMap
+					),
+				}));
 
 				const filtered =
 					records.filter((record) => {
 						const fields =
 							record.fields || {};
+
+						if (
+							template !== 4 &&
+							template !== 5 &&
+							!useAllClients &&
+							clientCodes.length > 0 &&
+							!clientCodes
+								.map(normalizeClientCode)
+								.includes(
+									normalizeClientCode(
+										getNormalizedField(
+											fields,
+											'khachhang'
+										)
+									)
+								)
+						) {
+							return false;
+						}
 
 						const dateValue =
 							template === 4 ||
@@ -297,7 +341,10 @@ module.exports = (router) => {
 								? getForm4ReceivingDate(
 										fields
 									)
-								: fields['Ngày'];
+								: getNormalizedField(
+										fields,
+										'ngay'
+									);
 
 						if (
 							(template === 4 ||
