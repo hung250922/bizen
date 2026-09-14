@@ -147,13 +147,288 @@ function AdminPage() {
 
   return (
     <section className="admin-page">
-      <header className="admin-header"><div><span className="admin-kicker">WORKSPACE / ACCESS CONTROL</span><h1>Quản lý tài khoản</h1><p>Kiểm soát thành viên và quyền truy cập dự án Bizen.</p></div><button type="button" className="admin-primary-button">＋ Mời thành viên</button></header>
-      {error && <div className="admin-error" role="alert">{error}<button type="button" onClick={loadUsers}>Thử lại</button></div>}
-      <div className="admin-stats"><article className="admin-stat-card admin-stat-card--accent"><span className="stat-icon">◉</span><div><strong>{users.length}</strong><span>Tổng thành viên</span></div></article><article className="admin-stat-card"><span className="stat-icon stat-icon--green">●</span><div><strong>{onlineCount}</strong><span>Đang online</span></div></article><article className="admin-stat-card"><span className="stat-icon stat-icon--gray">◌</span><div><strong>{users.length - onlineCount}</strong><span>Đang offline</span></div></article><article className="admin-stat-card"><span className="stat-icon stat-icon--orange">▣</span><div><strong>{lockedCount}</strong><span>Tài khoản bị khóa</span></div></article></div>
-      <div className="admin-toolbar"><div className="admin-tabs" role="tablist">{[['all', 'Tất cả'], ['online', '● Đang online'], ['offline', '○ Offline']].map(([value, label]) => <button key={value} type="button" className={status === value ? 'is-active' : ''} onClick={() => setStatus(value)}>{label}</button>)}</div><div className="admin-filters"><label className="admin-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo tên hoặc email..." /></label><select aria-label="Lọc theo vai trò" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="all">Tất cả vai trò</option>{roleOptions.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}</select><button type="button" className="filter-button" onClick={() => { setQuery(''); setRoleFilter('all'); setStatus('all') }}>↺ <span>Làm mới</span></button></div></div>
-      <div className="admin-table-shell"><div className="admin-table-heading"><div><h2>Thành viên dự án</h2><span>{filteredUsers.length} tài khoản được hiển thị</span></div><span className="sync-label">● Đồng bộ lần cuối: vừa xong</span></div><div className="admin-table-scroll"><table className="admin-table"><thead><tr><th>THÀNH VIÊN</th><th>TRẠNG THÁI</th><th>VAI TRÒ</th><th>QUYỀN TRUY CẬP</th><th>HOẠT ĐỘNG GẦN NHẤT</th><th aria-label="Thao tác" /></tr></thead><tbody>{loading ? <tr><td colSpan="6" className="empty-state">Đang tải dữ liệu tài khoản...</td></tr> : filteredUsers.map((user) => <tr key={user.id}><td><div className="member-cell"><div className="avatar-wrap"><img src={user.avatar} alt={`Ảnh đại diện ${user.name}`} onError={(event) => { event.currentTarget.style.display = 'none' }} /><span className="avatar-fallback" style={{ background: user.color }}>{initials(user.name)}</span><i className={user.online ? 'online-dot' : 'online-dot is-offline'} /></div><div><strong>{user.name}</strong><span>{user.email}</span></div></div></td><td><span className={`status-pill ${user.online ? 'is-online' : 'is-offline'}`}><i />{user.online ? 'Đang online' : 'Offline'}</span>{user.locked && <span className="locked-label">Đã khóa</span>}</td><td><select className="role-select" aria-label={`Vai trò của ${user.name}`} value={user.role} onChange={(event) => updateRole(user.id, event.target.value)}>{roleOptions.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}</select></td><td><div className="permission-grid">{tabPermissions.map((tab) => <button key={tab.key} type="button" className={user.permissions.includes(tab.key) ? 'permission-chip is-allowed' : 'permission-chip'} title={`${user.permissions.includes(tab.key) ? 'Tắt' : 'Bật'} quyền ${tab.label}`} onClick={() => updatePermission(user, tab.key)}>{tab.label}</button>)}</div></td><td><span className="last-seen">{user.lastSeen}</span></td><td><div className="row-actions"><button type="button" title={user.locked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'} className={user.locked ? 'action-button is-locked' : 'action-button'} onClick={() => setPendingAction({ type: 'lock', user })}>⌑</button><button type="button" title="Xóa thành viên" className="action-button action-button--danger" onClick={() => setPendingAction({ type: 'delete', user })}>⌫</button></div></td></tr>)}</tbody></table>{!loading && !filteredUsers.length && <div className="empty-state">Không tìm thấy tài khoản phù hợp.</div>}</div></div>
-      {pendingAction && <div className="admin-modal-backdrop" role="presentation" onClick={() => setPendingAction(null)}><div className="admin-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}><span className={`modal-symbol ${pendingAction.type === 'delete' ? 'is-danger' : ''}`}>{pendingAction.type === 'delete' ? '⌫' : '⌑'}</span><h2>{pendingAction.type === 'delete' ? 'Xóa thành viên?' : pendingAction.user.locked ? 'Mở khóa tài khoản?' : 'Khóa tài khoản?'}</h2><p>{pendingAction.type === 'delete' ? `Tài khoản ${pendingAction.user.name} sẽ bị xóa khỏi dự án và không thể hoàn tác.` : `Bạn có chắc muốn ${pendingAction.user.locked ? 'mở khóa' : 'khóa'} tài khoản của ${pendingAction.user.name}?`}</p><div className="modal-actions"><button type="button" className="modal-cancel" onClick={() => setPendingAction(null)}>Hủy</button><button type="button" className={pendingAction.type === 'delete' ? 'modal-confirm is-danger' : 'modal-confirm'} onClick={confirmAction}>{pendingAction.type === 'delete' ? 'Xóa thành viên' : pendingAction.user.locked ? 'Mở khóa' : 'Khóa tài khoản'}</button></div></div></div>}
-      <Pagination page={page} totalItems={filteredUserTotal} pageSize={25} onPageChange={setPage} label="tài khoản" />
+      <header className="admin-header">
+        <div>
+          <span className="admin-kicker">WORKSPACE / ACCESS CONTROL</span>
+          <h1>Quản lý tài khoản</h1>
+          <p>Kiểm soát thành viên và quyền truy cập dự án Bizen.</p>
+        </div>
+        <button type="button" className="admin-primary-button">＋ Mời thành viên</button>
+      </header>
+
+      {error && (
+        <div className="admin-error" role="alert">
+          {error}
+          <button type="button" onClick={loadUsers}>Thử lại</button>
+        </div>
+      )}
+
+      <div className="admin-stats">
+        <article className="admin-stat-card admin-stat-card--accent">
+          <span className="stat-icon">◉</span>
+          <div>
+            <strong>{users.length}</strong>
+            <span>Tổng thành viên</span>
+          </div>
+        </article>
+        <article className="admin-stat-card">
+          <span className="stat-icon stat-icon--green">●</span>
+          <div>
+            <strong>{onlineCount}</strong>
+            <span>Đang online</span>
+          </div>
+        </article>
+        <article className="admin-stat-card">
+          <span className="stat-icon stat-icon--gray">◌</span>
+          <div>
+            <strong>{users.length - onlineCount}</strong>
+            <span>Đang offline</span>
+          </div>
+        </article>
+        <article className="admin-stat-card">
+          <span className="stat-icon stat-icon--orange">▣</span>
+          <div>
+            <strong>{lockedCount}</strong>
+            <span>Tài khoản bị khóa</span>
+          </div>
+        </article>
+      </div>
+
+      <div className="admin-toolbar">
+        <div className="admin-tabs" role="tablist">
+          {[['all', 'Tất cả'], ['online', '● Đang online'], ['offline', '○ Offline']].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={status === value ? 'is-active' : ''}
+              onClick={() => setStatus(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="admin-filters">
+          <label className="admin-search">
+            <span>⌕</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Tìm theo tên hoặc email..."
+            />
+          </label>
+
+          <select
+            aria-label="Lọc theo vai trò"
+            value={roleFilter}
+            onChange={(event) => setRoleFilter(event.target.value)}
+          >
+            <option value="all">Tất cả vai trò</option>
+            {roleOptions.map((role) => (
+              <option key={role.value} value={role.value}>{role.label}</option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            className="filter-button"
+            onClick={() => {
+              setQuery('')
+              setRoleFilter('all')
+              setStatus('all')
+            }}
+          >
+            ↺ <span>Làm mới</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="admin-table-shell">
+        <div className="admin-table-heading">
+          <div>
+            <h2>Thành viên dự án</h2>
+            <span>{filteredUsers.length} tài khoản được hiển thị</span>
+          </div>
+          <span className="sync-label">● Đồng bộ lần cuối: vừa xong</span>
+        </div>
+
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>THÀNH VIÊN</th>
+                <th>TRẠNG THÁI</th>
+                <th>VAI TRÒ</th>
+                <th>QUYỀN TRUY CẬP</th>
+                <th>HOẠT ĐỘNG GẦN NHẤT</th>
+                <th aria-label="Thao tác" />
+              </tr>
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="empty-state">
+                    Đang tải dữ liệu tài khoản...
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <div className="member-cell">
+                        <div className="avatar-wrap">
+                          <img
+                            src={user.avatar}
+                            alt={`Ảnh đại diện ${user.name}`}
+                            onError={(event) => {
+                              event.currentTarget.style.display = 'none'
+                            }}
+                          />
+                          <span className="avatar-fallback" style={{ background: user.color }}>
+                            {initials(user.name)}
+                          </span>
+                          <i className={user.online ? 'online-dot' : 'online-dot is-offline'} />
+                        </div>
+
+                        <div>
+                          <strong>{user.name}</strong>
+                          <span>{user.email}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className={`status-pill ${user.online ? 'is-online' : 'is-offline'}`}>
+                        <i />
+                        {user.online ? 'Đang online' : 'Offline'}
+                      </span>
+                      {user.locked && <span className="locked-label">Đã khóa</span>}
+                    </td>
+
+                    <td>
+                      <select
+                        className="role-select"
+                        aria-label={`Vai trò của ${user.name}`}
+                        value={user.role}
+                        onChange={(event) => updateRole(user.id, event.target.value)}
+                      >
+                        {roleOptions.map((role) => (
+                          <option key={role.value} value={role.value}>{role.label}</option>
+                        ))}
+                      </select>
+                    </td>
+
+                    <td>
+                      <div className="permission-grid">
+                        {tabPermissions.map((tab) => (
+                          <button
+                            key={tab.key}
+                            type="button"
+                            className={user.permissions.includes(tab.key) ? 'permission-chip is-allowed' : 'permission-chip'}
+                            title={`${user.permissions.includes(tab.key) ? 'Tắt' : 'Bật'} quyền ${tab.label}`}
+                            onClick={() => updatePermission(user, tab.key)}
+                          >
+                            {tab.label}
+                          </button>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className="last-seen">{user.lastSeen}</span>
+                    </td>
+
+                    <td>
+                      <div className="row-actions">
+                        <button
+                          type="button"
+                          title={user.locked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
+                          className={user.locked ? 'action-button is-locked' : 'action-button'}
+                          onClick={() => setPendingAction({ type: 'lock', user })}
+                        >
+                          {user.locked ? '❤️' : '💔'}
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Xóa thành viên"
+                          className="action-button action-button--danger"
+                          onClick={() => setPendingAction({ type: 'delete', user })}
+                        >
+                          ⌫
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+
+          {!loading && !filteredUsers.length && (
+            <div className="empty-state">Không tìm thấy tài khoản phù hợp.</div>
+          )}
+        </div>
+      </div>
+
+      {pendingAction && (
+        <div
+          className="admin-modal-backdrop"
+          role="presentation"
+          onClick={() => setPendingAction(null)}
+        >
+          <div
+            className="admin-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className={`modal-symbol ${pendingAction.type === 'delete' ? 'is-danger' : ''}`}>
+              {pendingAction.type === 'delete' ? '⌫' : (pendingAction.user.locked ? '❤️' : '💔')}
+            </span>
+
+            <h2>
+              {pendingAction.type === 'delete'
+                ? 'Xóa thành viên?'
+                : pendingAction.user.locked
+                  ? 'Mở khóa tài khoản?'
+                  : 'Khóa tài khoản?'}
+            </h2>
+
+            <p>
+              {pendingAction.type === 'delete'
+                ? `Tài khoản ${pendingAction.user.name} sẽ bị xóa khỏi dự án và không thể hoàn tác.`
+                : `Bạn có chắc muốn ${pendingAction.user.locked ? 'mở khóa' : 'khóa'} tài khoản của ${pendingAction.user.name}?`}
+            </p>
+
+            <div className="modal-actions">
+              <button type="button" className="modal-cancel" onClick={() => setPendingAction(null)}>
+                Hủy
+              </button>
+              <button
+                type="button"
+                className={pendingAction.type === 'delete' ? 'modal-confirm is-danger' : 'modal-confirm'}
+                onClick={confirmAction}
+              >
+                {pendingAction.type === 'delete'
+                  ? 'Xóa thành viên'
+                  : pendingAction.user.locked
+                    ? 'Mở khóa'
+                    : 'Khóa tài khoản'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Pagination
+        page={page}
+        totalItems={filteredUserTotal}
+        pageSize={25}
+        onPageChange={setPage}
+        label="tài khoản"
+      />
     </section>
   )
 }

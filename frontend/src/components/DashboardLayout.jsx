@@ -86,6 +86,12 @@ const menuItems = [
     permission: 'baosoluongquanlysite',
   },
   {
+    to: '/export-excel',
+    label: 'Xuất Excel',
+    icon: '⇩',
+    permission: null,
+  },
+  {
     to: '/Admin',
     label: 'Admin',
     icon: '♙',

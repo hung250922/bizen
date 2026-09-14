@@ -54,6 +54,7 @@ require('./routes/userRoutes')(router);
 require('./routes/larkSuiteRoutes')(router);
 require('./routes/bizencateringRoutes')(router);
 require('./routes/exportExcelFileRoutes')(router);
+require('./routes/exportQuyTrinhExcelRoutes')(router);
 require('./routes/kiemthu3BuocRoutes')(router);
 
 if(process.env.NODE_ENV === 'production'){

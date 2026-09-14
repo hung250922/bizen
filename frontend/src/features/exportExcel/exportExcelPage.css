@@ -1,0 +1,293 @@
+.export-excel-page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f5f7f8;
+  color: #17252f;
+}
+
+.export-excel-header {
+  max-width: 1100px;
+  margin-bottom: 24px;
+}
+
+.export-excel-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: #0d9586;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.export-excel-header h1 {
+  margin: 0;
+  color: #1b2b34;
+  font-size: 30px;
+}
+
+.export-excel-header p {
+  margin: 8px 0 0;
+  color: #87949c;
+  font-size: 13px;
+}
+
+.export-excel-card,
+.export-excel-help {
+  max-width: 1100px;
+  padding: 24px;
+  border: 1px solid #e3e9eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 5px 22px rgba(29, 51, 61, 0.05);
+}
+
+.export-excel-card-header {
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.export-excel-card-header h2 {
+  margin: 0;
+  color: #20313a;
+  font-size: 18px;
+}
+
+.export-excel-card-header span {
+  display: block;
+  margin-top: 5px;
+  color: #98a4aa;
+  font-size: 12px;
+}
+
+.export-excel-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.export-excel-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.export-excel-field > span {
+  color: #596972;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.export-excel-field select,
+.export-excel-field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 13px;
+  border: 1px solid #dce5e7;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #344650;
+  font-size: 13px;
+}
+
+.export-excel-field select:focus,
+.export-excel-field input:focus {
+  border-color: #0f9f8f;
+  box-shadow: 0 0 0 3px rgba(15, 159, 143, 0.09);
+}
+
+.export-excel-company-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border: 1px solid #dce5e7;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.export-excel-company-list label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #344650;
+  font-size: 12px;
+}
+
+.export-excel-company-list input {
+  width: 15px;
+  height: 15px;
+  accent-color: #0d9586;
+}
+
+.export-excel-selected {
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 1fr;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 15px;
+  border: 1px solid #e5eeee;
+  border-radius: 10px;
+  background: #f7fbfa;
+}
+
+.export-excel-selected span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8a999f;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.export-excel-selected strong {
+  display: block;
+  overflow: hidden;
+  color: #31505a;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.export-excel-message {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.export-excel-message.success {
+  border: 1px solid #cbe8df;
+  background: #f0faf7;
+  color: #19735f;
+}
+
+.export-excel-message.error {
+  border: 1px solid #f1d0d0;
+  background: #fff6f6;
+  color: #a64242;
+}
+
+.export-excel-loading {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid #d9eeea;
+  border-radius: 8px;
+  background: #f4fbfa;
+  color: #28766d;
+  font-size: 12px;
+}
+
+.export-excel-loading-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.export-excel-spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 2px solid #b9dfd8;
+  border-top-color: #0d9586;
+  border-radius: 50%;
+  animation: export-excel-spin 0.8s linear infinite;
+}
+
+.export-excel-loading-track {
+  height: 5px;
+  margin-top: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dcefeb;
+}
+
+.export-excel-loading-bar {
+  width: 38%;
+  height: 100%;
+  border-radius: inherit;
+  background: #0d9586;
+  animation: export-excel-loading-move 1.2s ease-in-out infinite;
+}
+
+@keyframes export-excel-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes export-excel-loading-move {
+  0% { transform: translateX(-120%); }
+  50% { transform: translateX(155%); }
+  100% { transform: translateX(285%); }
+}
+
+.export-excel-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.export-excel-button {
+  min-width: 150px;
+  height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #0d9586;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.export-excel-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.export-excel-help {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 15px 17px;
+}
+
+.export-excel-help-icon {
+  color: #0d9586;
+  font-weight: 800;
+}
+
+.export-excel-help strong {
+  display: block;
+  color: #40525b;
+  font-size: 12px;
+}
+
+.export-excel-help p {
+  margin: 4px 0 0;
+  color: #8c999f;
+  font-size: 11px;
+}
+
+@media (max-width: 800px) {
+  .export-excel-page {
+    padding: 20px;
+  }
+
+  .export-excel-form-grid,
+  .export-excel-selected {
+    grid-template-columns: 1fr;
+  }
+
+  .export-excel-company-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .export-excel-actions,
+  .export-excel-button {
+    width: 100%;
+  }
+}

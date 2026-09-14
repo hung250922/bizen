@@ -25,6 +25,7 @@ import MonAnTheoMuaPage from './features/monantheomua/MonAnTheoMuaPage'
 import KiemThucBaBuocPage from './features/kiemthucbabuoc/KiemThucBaBuocPage'
 import AdminPage from './features/admin/AdminPage'
 import DashboardPage from './features/dashboard/DashboardPage'
+import ExportExcelPage from './features/exportExcel/ExportExcelPage'
 import { canAccessTab, getStoredUser } from './features/admin/permissions'
 
 function ProtectedRoute() {
@@ -142,6 +143,7 @@ function App() {
           <Route path="/lamthucdontuan" element={<PermissionRoute permission="lamthucdontuan"><LamThucDonTuanPage /></PermissionRoute>} />
           <Route path="/monantheomua" element={<PermissionRoute permission="monantheomua"><MonAnTheoMuaPage /></PermissionRoute>} />
           <Route path="/kiemthucbabuoc" element={<PermissionRoute permission="kiemthucbabuoc"><KiemThucBaBuocPage /></PermissionRoute>} />
+          <Route path="/export-excel" element={<ExportExcelPage />} />
           <Route path="/Admin" element={<PermissionRoute permission="admin"><AdminPage /></PermissionRoute>} />
           </Route>
           
